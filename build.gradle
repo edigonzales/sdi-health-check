@@ -11,8 +11,9 @@ sourceCompatibility = '16'
 targetCompatibility = '16'
 
 repositories {
-	mavenCentral()
+    maven { url "https://repo.osgeo.org/repository/release/" }
 	maven { url "http://jars.interlis.ch"; allowInsecureProtocol true }
+    mavenCentral()
 }
 
 dependencies {
@@ -23,6 +24,8 @@ dependencies {
    
     implementation 'org.jobrunr:jobrunr-spring-boot-starter:1.3.1'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.9'
+    
+    implementation 'org.geotools:gt-wms:25.0'
     
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

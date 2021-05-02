@@ -9,6 +9,8 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class ProbeVars {
+    public ProbeVars() {}
+    
     public ProbeVars(String probeClass, String parameters) {
         this.probeClass = probeClass;
         this.parameters = parameters;

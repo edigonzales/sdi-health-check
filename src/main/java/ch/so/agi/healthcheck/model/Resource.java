@@ -21,15 +21,18 @@ public class Resource {
     private Long id;
     
     @Enumerated(EnumType.STRING)
+    @NotNull
     private ResourceType type;
     
-    private boolean active;
+    private boolean active = true;
     
-    //@NotNull
+    @NotNull
     private String title;
     
+    @NotNull
     private String url;
     
+    @NotNull
     private int runFrequency;
     
     @OneToMany(
