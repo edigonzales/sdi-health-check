@@ -140,24 +140,29 @@ public abstract class Probe {
                 HttpHeaders headers = response.headers();
                 headers.map().forEach((k, v) -> System.out.println(k + ":" + v));
                 
+
                 WebMapServer wms = null;
                 try {
+//                    System.setProperty("sun.net.client.defaultReadTimeout", "10000");
+//                    System.setProperty("sun.net.client.defaultConnectTimeout", "5000");
+
                   wms = new WebMapServer(new URL(requestUrl));
                 } catch (Exception e) {
                     e.printStackTrace();
                 } 
 
 
-                WMSCapabilities capabilities = wms.getCapabilities();
-                String serverName = capabilities.getService().getName();
-                String serverTitle = capabilities.getService().getTitle();
-                System.out.println(capabilities.getLayerList().size());
-                System.out.println(capabilities.getService());
-                for (Layer layer:  capabilities.getLayerList()) {
-                    System.out.println(layer.getName());
-                }
-                System.out.println("Capabilities retrieved from server: " + serverName + " (" + serverTitle + ")");
-
+//                WMSCapabilities capabilities = wms.getCapabilities();
+//                String serverName = capabilities.getService().getName();
+//                String serverTitle = capabilities.getService().getTitle();
+//                System.out.println(capabilities.getLayerList().size());
+//                System.out.println(capabilities.getService());
+//                for (Layer layer:  capabilities.getLayerList()) {
+//                    System.out.println(layer.getName());
+//                }
+//                System.out.println("Capabilities retrieved from server: " + serverName + " (" + serverTitle + ")");
+                System.out.println("fubar");
+                
             }                
         } catch (Exception e) {
             e.printStackTrace();

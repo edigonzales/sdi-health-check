@@ -7,10 +7,19 @@ plugins {
 group = 'io.github.sogis'
 version = '0.0.1-SNAPSHOT'
 
-sourceCompatibility = '16'
-targetCompatibility = '16'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+configurations.all {
+    resolutionStrategy {
+        cacheDynamicVersionsFor 0, 'seconds'
+        cacheChangingModulesFor 0, 'seconds'
+    }
+}
+
 
 repositories {
+    mavenLocal()
     maven { url "https://repo.osgeo.org/repository/release/" }
 	maven { url "http://jars.interlis.ch"; allowInsecureProtocol true }
     mavenCentral()

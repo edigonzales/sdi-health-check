@@ -42,9 +42,10 @@ public class SdiHealthCheckApplication {
 	        Resource resource = new Resource();
 	        resource.setType(ResourceType.OGC_WMS);
 	        resource.setTitle("SOGIS WMS (Prod)");
-	        resource.setUrl("http://map.geo.gl.ch/ows/mainmap");
-//            resource.setUrl("https://geo.so.ch/wms");
+//	        resource.setUrl("http://map.geo.gl.ch/ows/mainmap");
+            resource.setUrl("https://geo.so.ch/wms");
 //            resource.setUrl("https://wms.geo.admin.ch/");
+//            resource.setUrl("https://geodienste.ch/db/av_0/deu");
 	        resource.setActive(true);
 	        resource.setRunFrequency(60);
 	        
