@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class WmsGetCaps extends Probe {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
+    // TODO: auch via Constructor machen.
     private String requestTemplate = "?SERVICE=${service}&VERSION=${version}&REQUEST=GetCapabilities";
       
     private List<ParamDef> paramDefs = Arrays.asList(
@@ -20,6 +21,7 @@ public class WmsGetCaps extends Probe {
             new ParamDef("version", "java.lang.String", "The WMS service version within resource endpoint")
             );
 
+    // TODO: alles mittels Constructor
     public WmsGetCaps() {
         super();
         super.setRequestTemplate(this.requestTemplate);
