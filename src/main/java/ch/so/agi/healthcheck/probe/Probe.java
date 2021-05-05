@@ -49,6 +49,12 @@ public abstract class Probe {
         
     }
     
+    public Probe(String requestTemplate, List<ParamDef> paramDefs, Map<String, String> requestHeaders) {
+        this.requestTemplate = requestTemplate;
+        this.paramDefs = paramDefs;
+        this.requestHeaders = requestHeaders;
+    }
+    
     public String getRequestMethod() {
         return requestMethod;
     }
@@ -95,6 +101,7 @@ public abstract class Probe {
     
     public void performRequest(String resourceUrl, String requestParameters) {
         log.info("base class: performRequets");
+        log.info(requestTemplate);
 
         Map<String, Object> requestParamsMap = null;
         try {

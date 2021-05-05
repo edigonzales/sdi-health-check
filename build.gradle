@@ -19,7 +19,7 @@ configurations.all {
 
 
 repositories {
-    mavenLocal()
+    //mavenLocal()
     maven { url "https://repo.osgeo.org/repository/release/" }
 	maven { url "http://jars.interlis.ch"; allowInsecureProtocol true }
     mavenCentral()
