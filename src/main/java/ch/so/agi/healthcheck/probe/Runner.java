@@ -36,7 +36,7 @@ public class Runner {
             log.info(probeVars.getProbeClass());
         
             ProbeFactory probeFactory = new ProbeFactory();
-            Probe probe = probeFactory.getProbe(probeVars.getProbeClass());
+            IProbe probe = probeFactory.getProbe(probeVars.getProbeClass());
             log.info(probe.getClass().toString());
             
 //            probe.setProbeVars(probeVars);
