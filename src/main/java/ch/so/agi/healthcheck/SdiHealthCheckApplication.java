@@ -24,7 +24,6 @@ import ch.so.agi.healthcheck.model.Resource;
 import ch.so.agi.healthcheck.model.ResourceDTO;
 import ch.so.agi.healthcheck.model.ResourceType;
 import ch.so.agi.healthcheck.probe.WmsGetCaps;
-import ch.so.agi.healthcheck.probe.ClassProbe;
 import ch.so.agi.healthcheck.probe.Runner;
 import ch.so.agi.healthcheck.repository.ResourceRepository;
 
