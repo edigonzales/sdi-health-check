@@ -11,8 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import ch.so.agi.healthcheck.check.CheckFactory;
+import ch.so.agi.healthcheck.check.Check;
+import ch.so.agi.healthcheck.model.CheckVars;
+import ch.so.agi.healthcheck.model.CheckVarsDTO;
+import ch.so.agi.healthcheck.model.ProbeVarsDTO;
+
 @Service
-public class WmsGetCaps implements IProbe {
+public class WmsGetCaps implements Probe {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private String requestMethod = "GET";
@@ -26,23 +32,32 @@ public class WmsGetCaps implements IProbe {
     // TODO: mit getXXXXXX im Interface könnte man es wohl schon noch so machen, dass man run nicht
     // zu implementieren braucht im Regelfall.
     @Override
-    public void run(String url, String requestParameters) {
+    public void run(String url, ProbeVarsDTO probeVars) {
         ProbeResult result = new ProbeResult();
         
         this.beforeRequest();
         try {
-            HttpResponse<InputStream> response = this.performRequest(url, requestParameters, this.requestTemplate, this.requestMethod, this.requestHeaders);
+            HttpResponse<InputStream> response = this.performRequest(url, probeVars.getParameters(), this.requestTemplate, this.requestMethod, this.requestHeaders);
             result.setResponse(response);
         } catch (Exception e) {
             e.printStackTrace();
         }
         this.afterRequest();
-        this.runChecks(result);
+        this.runChecks(result, probeVars.getChecksVars());
 
     }
 
     @Override
-    public void runChecks(ProbeResult result) {
+    public void runChecks(ProbeResult result, List<CheckVarsDTO> checksVars) {
         log.info("{}", result.isSuccess());
+        
+        for (CheckVarsDTO checkVars : checksVars) {
+            Check check = CheckFactory.getProbe(checkVars.getCheckClass());
+            check.perform(result, checkVars);
+
+        }
+        
+        
+        
     };
 }
