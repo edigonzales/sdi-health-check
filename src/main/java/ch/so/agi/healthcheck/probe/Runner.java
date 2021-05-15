@@ -24,9 +24,12 @@ public class Runner {
     @Autowired
     ResourceRepository resourceRepository;
 
+    // Würde wahrscheinlich so eh nicht mehr gehen, wenn die Klasse in einem anderen
+    // Container läuft... Oder dann erst recht wieder (eigentlich)?
     // TODO: use jdbc templates instead (?). read only.
     // oder DTO projection?
     // oder eager (in unserem Fall wohl kein Drama).
+    // oder doch DTO übergeben, das kann ja jetzt einfach serialisert werden und ist nicht extrem gross.
     @Transactional
     public void run(Long id) {
         log.info("id: " + id);

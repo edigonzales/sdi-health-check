@@ -82,11 +82,11 @@ public interface Probe {
 
                 HttpResponse<InputStream> response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
                 
-                System.out.println(response.body());
-                System.out.println(response.statusCode());
-
-                HttpHeaders headers = response.headers();
-                headers.map().forEach((k, v) -> System.out.println(k + ":" + v));
+//                System.out.println(response.body());
+//                System.out.println(response.statusCode());
+//
+//                HttpHeaders headers = response.headers();
+//                headers.map().forEach((k, v) -> System.out.println(k + ":" + v));
                 
                 return response;
                 

@@ -44,6 +44,10 @@ public class WmsGetCaps implements Probe {
         }
         this.afterRequest();
         this.runChecks(result, probeVars.getChecksVars());
+     
+        // Wann und wo und wie wird das alles in die DB zurückgeschrieben?
+        System.out.println(result.getCheckResults().get(0).isSuccess());
+
 
     }
 
@@ -57,7 +61,7 @@ public class WmsGetCaps implements Probe {
 
         }
         
-        
+        // 
         
     };
 }
