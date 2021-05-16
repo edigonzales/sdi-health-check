@@ -18,6 +18,7 @@ import ch.so.agi.healthcheck.model.CheckVarsDTO;
 import ch.so.agi.healthcheck.model.ProbeVarsDTO;
 
 @Service
+// TODO Beschreibung etc. als Annotation?
 public class WmsGetCaps implements Probe {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
