@@ -1,6 +1,7 @@
 package ch.so.agi.healthcheck.probe;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -15,7 +16,9 @@ import ch.so.agi.healthcheck.model.ProbeVars;
 import ch.so.agi.healthcheck.model.ProbeVarsDTO;
 import ch.so.agi.healthcheck.model.Resource;
 import ch.so.agi.healthcheck.model.ResourceDTO;
+import ch.so.agi.healthcheck.model.Run;
 import ch.so.agi.healthcheck.repository.ResourceRepository;
+import ch.so.agi.healthcheck.repository.RunRepository;
 
 @Service
 public class Runner {
@@ -23,6 +26,10 @@ public class Runner {
 
     @Autowired
     ResourceRepository resourceRepository;
+    
+    @Autowired
+    RunRepository runRepository;
+
 
     // Würde wahrscheinlich so eh nicht mehr gehen, wenn die Klasse in einem anderen
     // Container läuft... Oder dann erst recht wieder (eigentlich)?
@@ -55,16 +62,19 @@ public class Runner {
             ProbeFactory probeFactory = new ProbeFactory();
             Probe probe = probeFactory.getProbe(probeVars.getProbeClass());
             log.info(probe.getClass().toString());
+                        
+            ProbeResult result = probe.run(resourceDTO, probeVars);
             
-//            probe.setProbeVars(probeVars);
-//            probe.setResourceUrl(resource.getUrl());
+            Run runObj = new Run();
+            runObj.setCheckedDatetime(new Date());
             
-            probe.run(resource.getUrl(), probeVars);
+            if(result.isSuccess()) {
+                runObj.setMessage("OK");
+                runObj.setSuccess(true);
+            } // TODO else
             
-        
+            runObj.setResource(resource);
+            runRepository.save(runObj);
         }
-
-        
-        
     }
 }

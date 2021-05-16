@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.text.StringSubstitutor;
-import org.geotools.ows.wms.WebMapServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ch.so.agi.healthcheck.model.CheckVars;
 import ch.so.agi.healthcheck.model.CheckVarsDTO;
 import ch.so.agi.healthcheck.model.ProbeVarsDTO;
+import ch.so.agi.healthcheck.model.ResourceDTO;
 
 public interface Probe {
     final Logger log = LoggerFactory.getLogger(Probe.class);
@@ -89,20 +89,16 @@ public interface Probe {
 //                headers.map().forEach((k, v) -> System.out.println(k + ":" + v));
                 
                 return response;
-                
             }                
- 
-        
         return null;
     }
    
-    default void afterRequest() {
-    
-    };
+    default void afterRequest() {};
    
     public void runChecks(ProbeResult result, List<CheckVarsDTO> checksVars);
     
-    default void run(String url, ProbeVarsDTO probeVars) {
+    public ProbeResult run(ResourceDTO resource, ProbeVarsDTO probeVars);
+//    default void run(String url, ProbeVarsDTO probeVars) {
 //        log.info(url);
 //        log.info(requestParameters);
 //        
@@ -111,5 +107,5 @@ public interface Probe {
 //        this.afterRequest();
         
 //        this.runChecks();
-    }
+//    }
 }

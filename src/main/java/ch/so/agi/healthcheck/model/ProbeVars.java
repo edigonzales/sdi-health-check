@@ -84,6 +84,9 @@ public class ProbeVars {
     
     public void setChecks(List<CheckVars> checksVars) {
         this.checksVars = checksVars;
+        for (CheckVars checkVars : this.checksVars) {
+            checkVars.setProbeVars(this);
+        }
     }
     
     public void addCheck(CheckVars checkVars) {

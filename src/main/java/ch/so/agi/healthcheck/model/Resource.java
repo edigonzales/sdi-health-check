@@ -33,7 +33,7 @@ public class Resource {
     private String url;
     
     @NotNull
-    private int runFrequency;
+    private String runFrequency;
     
     @OneToMany(
             mappedBy = "resource",
@@ -82,11 +82,11 @@ public class Resource {
         this.url = url;
     }
 
-    public int getRunFrequency() {
+    public String getRunFrequency() {
         return runFrequency;
     }
 
-    public void setRunFrequency(int runFrequency) {
+    public void setRunFrequency(String runFrequency) {
         this.runFrequency = runFrequency;
     }
 
@@ -96,6 +96,9 @@ public class Resource {
 
     public void setProbes(List<ProbeVars> probesVars) {
         this.probesVars = probesVars;
+        for (ProbeVars probeVars : this.probesVars) {
+            probeVars.setResource(this);
+        }
     }
 
     public void addProbe(ProbeVars probeVars) {

@@ -15,7 +15,7 @@ public class ResourceDTO {
     
     private String url;
     
-    private int runFrequency;
+    private String runFrequency;
     
     private List<ProbeVarsDTO> probesVars = new ArrayList<>();
 
@@ -59,11 +59,11 @@ public class ResourceDTO {
         this.url = url;
     }
 
-    public int getRunFrequency() {
+    public String getRunFrequency() {
         return runFrequency;
     }
 
-    public void setRunFrequency(int runFrequency) {
+    public void setRunFrequency(String runFrequency) {
         this.runFrequency = runFrequency;
     }
 

@@ -1,0 +1,50 @@
+management:
+  endpoint:
+    health:
+      show-details: always
+  health:
+    probes:
+      enabled: true
+org:
+  jobrunr:
+    background-job-server:
+      enabled: true
+      worker_count: '1'
+    dashboard:
+      enabled: true
+spring:
+  datasource:
+    driverClassName: org.h2.Driver
+    password: ''
+    url: jdbc:h2:mem:shcdb
+    username: sa
+  h2:
+    console:
+      enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
+
+app:
+  resources:
+    - identifier: 1
+      title: SOGIS WMS (Prod)
+      url: https://geo.so.ch/wms
+      type: OGC_WMS
+      runFrequency: 0 * * * *
+      active: true
+      probesVars:
+        - identifier: 11
+          probeClass: ch.so.agi.healthcheck.probe.WmsGetCaps
+          parameters: "{\"service\": \"WMS\", \"version\": \"1.3.0\"}"
+          checksVars:
+            - identifier: 111
+              checkClass: ch.so.agi.healthcheck.check.HttpStatusNoError
+              parameters: 
+            - identifier: 111
+              checkClass: ch.so.agi.healthcheck.check.HasUniqueWmsLayerIdentifiers
+              parameters: 
+
+           
+      

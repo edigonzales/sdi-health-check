@@ -7,7 +7,7 @@ public class HttpStatusNoError implements Check {
 
     @Override
     public void perform(ProbeResult result, CheckVarsDTO checkVars) {
-        log.info("do something checker");
+        log.info("HttpStatusNoError");
         
         CheckResult checkResult = new CheckResult();
         checkResult.setClassName(this.getClass().getCanonicalName());
