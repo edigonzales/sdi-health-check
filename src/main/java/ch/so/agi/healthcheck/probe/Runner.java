@@ -77,13 +77,12 @@ public class Runner {
             Probe probe = probeFactory.getProbe(probeVars.getProbeClass());
             log.info(probe.getClass().toString());
                     
-            Instant start = Instant.now();
+            Instant startProbe = Instant.now();
             ProbeResult result = probe.run(resourceDTO, probeVars);
-            Instant finish = Instant.now();
+            Instant finishProbe = Instant.now();
             
-            long elapsedTime = Duration.between(start, finish).toMillis();
+            long elapsedTime = Duration.between(startProbe, finishProbe).toMillis();
             result.setElapsedTime(elapsedTime);
-            
             
             Run runObj = new Run();
             runObj.setCheckedDatetime(new Date());
