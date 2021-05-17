@@ -2,7 +2,9 @@ package ch.so.agi.healthcheck.check;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -35,6 +37,7 @@ public class HasUniqueWmsLayerIdentifiers implements Check {
         
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();  
         DocumentBuilder db;
+        List<String> duplicateLayers =  new ArrayList<String>();
         try {
             db = dbf.newDocumentBuilder();
             Document doc = db.parse(is);  
@@ -42,33 +45,33 @@ public class HasUniqueWmsLayerIdentifiers implements Check {
             doc.getDocumentElement().normalize();  
             NodeList nodeList = doc.getElementsByTagName("Layer"); 
 
-            Map wmsLayers = new HashMap<String,WmsLayer>();
+            Map<String,String> wmsLayers = new HashMap<String,String>();
+            duplicateLayers = new ArrayList<String>();
             for (int itr = 0; itr < nodeList.getLength(); itr++) {  
                 Node node = nodeList.item(itr);            
-                
-                // Falls parentNode.getNodeName != Layer ist, dann es ist es das WMS-Root-Layer-Element
-                // Ist aber eigentlich egal für diesen Test.
-                //log.info(node.getParentNode().getNodeName());
-                
+           
                 if (node.getNodeType() == Node.ELEMENT_NODE) {  
                     Element eElement = (Element) node;
                     String name =  eElement.getElementsByTagName("Name").item(0).getTextContent();
                     String title =  eElement.getElementsByTagName("Title").item(0).getTextContent();
-                    
-//                    log.info(name);
-                    
+                    if (wmsLayers.containsKey(name)) {
+                        duplicateLayers.add(name);
+                    } else {
+                        wmsLayers.put(name, title);
+                    }
                 }
             }
             
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
+            checkResult.setSuccess(false);
+            checkResult.setMessage(e.getMessage());
         }  
 
-        
-        
-        
-        
-        
+        if (duplicateLayers.size() > 0) {
+            checkResult.setSuccess(false);
+            checkResult.setMessage("Duplicate layer(s) found: "  + String.join(", ", duplicateLayers));
+        }
         
         result.addCheckResult(checkResult);
     }

@@ -1,6 +1,9 @@
 package ch.so.agi.healthcheck.probe;
 
 import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -12,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.so.agi.healthcheck.check.CheckResult;
 import ch.so.agi.healthcheck.model.ProbeVars;
 import ch.so.agi.healthcheck.model.ProbeVarsDTO;
 import ch.so.agi.healthcheck.model.Resource;
@@ -43,7 +47,7 @@ public class Runner {
         
         Resource resource = resourceRepository.findById(id).orElseThrow();
         
-        // Brauche ich wahrscheinlich nicht mehr. Die DTO werden von Spring Data befühlt.
+        // Brauche ich wahrscheinlich nicht mehr. Die DTO werden von Spring Data befüllt.
         // Ich will hier nichts mehr mit JPA zu tun haben (?!)
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration()
@@ -54,6 +58,16 @@ public class Runner {
         
         List<ProbeVarsDTO> probesVars = resourceDTO.getProbesVars();
         
+        // TODO:
+        // responseTime vs. elapsedTime.
+        // a) naming?
+        // b) summe aller probes elapsedTime ergibt resonseTime von run.
+        // Eigentlich passt mir responseTime nicht so, erinnert doch stark an request/response.
+        // Aber vielleicht doch ok. Oder nur dort, wo es wirklich ein request/response im Check gibt? Z.B. getMap().
+        // Was ist dann mit getCapabilities?
+        // Probe _und_ Check haben responseTime.
+        // Konzentrierter anschauen morgen.
+        
         for (ProbeVarsDTO probeVars : probesVars) {
             log.info(probeVars.getJobrunrId());
             log.info(probeVars.getParameters());    
@@ -62,8 +76,14 @@ public class Runner {
             ProbeFactory probeFactory = new ProbeFactory();
             Probe probe = probeFactory.getProbe(probeVars.getProbeClass());
             log.info(probe.getClass().toString());
-                        
+                    
+            Instant start = Instant.now();
             ProbeResult result = probe.run(resourceDTO, probeVars);
+            Instant finish = Instant.now();
+            
+            long elapsedTime = Duration.between(start, finish).toMillis();
+            result.setElapsedTime(elapsedTime);
+            
             
             Run runObj = new Run();
             runObj.setCheckedDatetime(new Date());
@@ -71,7 +91,18 @@ public class Runner {
             if(result.isSuccess()) {
                 runObj.setMessage("OK");
                 runObj.setSuccess(true);
-            } // TODO else
+            } else {
+                // TODO stream api?
+                List<String> checkResultMessages = new ArrayList<String>();
+                for (CheckResult checkResult : result.getCheckResults()) {
+                    if(!checkResult.isSuccess()) {
+                        checkResultMessages.add(checkResult.getMessage());
+                    }
+                }
+                runObj.setReport(null); // TODO: mit jackson serialisieren
+                runObj.setMessage(String.join(", ", checkResultMessages));
+                runObj.setSuccess(false);
+            }
             
             runObj.setResource(resource);
             runRepository.save(runObj);

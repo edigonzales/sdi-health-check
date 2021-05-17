@@ -11,6 +11,8 @@ public class ProbeResult {
     
     private boolean success = true;
     
+    private long elapsedTime;
+    
     private List<CheckResult> checkResults = new ArrayList<CheckResult>();
 
     public HttpResponse getResponse() {
@@ -27,6 +29,14 @@ public class ProbeResult {
 
     public void setSuccess(boolean success) {
         this.success = success;
+    }
+
+    public long getElapsedTime() {
+        return elapsedTime;
+    }
+
+    public void setElapsedTime(long elapsedTime) {
+        this.elapsedTime = elapsedTime;
     }
 
     public List<CheckResult> getCheckResults() {

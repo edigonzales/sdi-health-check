@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ch.so.agi.healthcheck.check.CheckFactory;
+import ch.so.agi.healthcheck.check.CheckResult;
 import ch.so.agi.healthcheck.check.Check;
 import ch.so.agi.healthcheck.model.CheckVars;
 import ch.so.agi.healthcheck.model.CheckVarsDTO;
@@ -47,8 +48,12 @@ public class WmsGetCaps implements Probe {
         this.afterRequest();
         this.runChecks(result, probeVars.getChecksVars());
      
-        // Wann und wo und wie wird das alles in die DB zurückgeschrieben?
-        System.out.println(result.getCheckResults().get(0).isSuccess());
+        // TODO: default interface o.ä.
+        for (CheckResult checkResult : result.getCheckResults()) {
+            if (!checkResult.isSuccess()) {
+                result.setSuccess(false);
+            }
+        }
         
         return result;
     }
@@ -60,7 +65,6 @@ public class WmsGetCaps implements Probe {
         for (CheckVarsDTO checkVars : checksVars) {
             Check check = CheckFactory.getCheck(checkVars.getCheckClass());
             check.perform(result, checkVars);
-
         }
     };
 }
