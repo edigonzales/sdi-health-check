@@ -35,9 +35,9 @@ public class WmsGetCaps implements Probe {
     // TODO: mit getXXXXXX im Interface könnte man es wohl schon noch so machen, dass man run nicht
     // zu implementieren braucht im Regelfall.
     @Override
-    public ProbeResult run(ResourceDTO resource, ProbeVarsDTO probeVars) {
-        ProbeResult result = new ProbeResult();
-        
+    public ProbeResult2 run(ResourceDTO resource, ProbeVarsDTO probeVars) {
+        ProbeResult2 result = new ProbeResult2();
+               
         this.beforeRequest();
         try {
             HttpResponse<InputStream> response = this.performRequest(resource.getUrl(), probeVars.getParameters(), this.requestTemplate, this.requestMethod, this.requestHeaders);
@@ -48,23 +48,37 @@ public class WmsGetCaps implements Probe {
         this.afterRequest();
         this.runChecks(result, probeVars.getChecksVars());
      
-        // TODO: default interface o.ä.
-        for (CheckResult checkResult : result.getCheckResults()) {
-            if (!checkResult.isSuccess()) {
-                result.setSuccess(false);
-            }
-        }
+//        // TODO: default interface o.ä.
+//        for (CheckResult checkResult : result.getCheckResults()) {
+//            if (!checkResult.isSuccess()) {
+//                result.setSuccess(false);
+//            }
+//        }
         
         return result;
     }
 
     @Override
-    public void runChecks(ProbeResult result, List<CheckVarsDTO> checksVars) {
+    public void runChecks(ProbeResult2 result, List<CheckVarsDTO> checksVars) {
         log.info("{}", result.isSuccess());
+        
+        
+        ProbeResult probeResult = new ProbeResult(this);
+
         
         for (CheckVarsDTO checkVars : checksVars) {
             Check check = CheckFactory.getCheck(checkVars.getCheckClass());
-            check.perform(result, checkVars);
+            check.setProbe(this);
+            check.perform(checkVars);
+            
+            check.setResult(false, "not ok...");
+
+            System.out.println("*" + check);
+            probeResult.addResult(check.getResult());
+            
         }
+        
+        log.info(probeResult.getReport());
+
     };
 }

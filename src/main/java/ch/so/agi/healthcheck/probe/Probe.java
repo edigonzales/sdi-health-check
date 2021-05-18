@@ -95,9 +95,9 @@ public interface Probe {
    
     default void afterRequest() {};
    
-    public void runChecks(ProbeResult result, List<CheckVarsDTO> checksVars);
+    public void runChecks(ProbeResult2 result, List<CheckVarsDTO> checksVars);
     
-    public ProbeResult run(ResourceDTO resource, ProbeVarsDTO probeVars);
+    public ProbeResult2 run(ResourceDTO resource, ProbeVarsDTO probeVars);
 //    default void run(String url, ProbeVarsDTO probeVars) {
 //        log.info(url);
 //        log.info(requestParameters);

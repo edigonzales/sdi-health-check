@@ -78,7 +78,7 @@ public class Runner {
             log.info(probe.getClass().toString());
                     
             Instant startProbe = Instant.now();
-            ProbeResult result = probe.run(resourceDTO, probeVars);
+            ProbeResult2 result = probe.run(resourceDTO, probeVars);
             Instant finishProbe = Instant.now();
             
             long elapsedTime = Duration.between(startProbe, finishProbe).toMillis();

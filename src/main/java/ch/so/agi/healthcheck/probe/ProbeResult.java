@@ -1,53 +1,47 @@
 package ch.so.agi.healthcheck.probe;
 
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import ch.so.agi.healthcheck.Result;
 import ch.so.agi.healthcheck.check.CheckResult;
 
-public class ProbeResult {
-    private HttpResponse response;
+public class ProbeResult extends Result {
+    private Probe probe;
     
-    private boolean success = true;
-    
-    private long elapsedTime;
-    
-    private List<CheckResult> checkResults = new ArrayList<CheckResult>();
-
-    public HttpResponse getResponse() {
-        return response;
+    public ProbeResult(Probe probe) {
+        this.probe = probe;
     }
 
-    public void setResponse(HttpResponse response) {
-        this.response = response;
+    public String getReport() {
+        reportMap.put("class", this.probe.getClass().getCanonicalName());
+        reportMap.put("success", this.success);
+        reportMap.put("message", this.message);
+        reportMap.put("response_time", String.valueOf(this.responseTimeSecs));
+        
+        List<Map> reports = new ArrayList<>();
+        for (Result result : this.results) {
+            reports.add(((CheckResult) result).getRawReport());
+        }
+        reportMap.put("reports", reports);
+        
+        try {
+            return new ObjectMapper().writeValueAsString(reportMap);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 
-    public boolean isSuccess() {
-        return success;
+    @Override
+    public Map<String, Object> getRawReport() {
+        this.getReport();
+        return reportMap;
     }
 
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public long getElapsedTime() {
-        return elapsedTime;
-    }
-
-    public void setElapsedTime(long elapsedTime) {
-        this.elapsedTime = elapsedTime;
-    }
-
-    public List<CheckResult> getCheckResults() {
-        return checkResults;
-    }
-
-    public void setCheckResults(List<CheckResult> checkResults) {
-        this.checkResults = checkResults;
-    }
-    
-    public void addCheckResult(CheckResult checkResult) {
-        this.checkResults.add(checkResult);
-    }
 }

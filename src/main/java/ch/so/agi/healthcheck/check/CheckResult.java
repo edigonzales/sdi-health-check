@@ -1,34 +1,37 @@
 package ch.so.agi.healthcheck.check;
 
-public class CheckResult {
-    private String className;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import ch.so.agi.healthcheck.Result;
+
+public class CheckResult extends Result {
+    private Check check;
     
-    private boolean success = true;
+    public CheckResult(Check check) {
+        this.check = check;
+    }
     
-    private String message;
-
-    public String getClassName() {
-        return className;
+    // TODO: report pojo? doch sinnvoll?
+    public String getReport() {
+        // TODO name!
+        reportMap.put("class", this.check.getClass().getCanonicalName());
+        reportMap.put("success", this.success);
+        reportMap.put("message", this.message);
+        reportMap.put("response_time", String.valueOf(this.responseTimeSecs));
+        try {
+            return new ObjectMapper().writeValueAsString(reportMap);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
-
-    public void setClassName(String className) {
-        this.className = className;
+    
+    public Map<String,Object> getRawReport() {
+        this.getReport();
+        return reportMap;
     }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
 }
