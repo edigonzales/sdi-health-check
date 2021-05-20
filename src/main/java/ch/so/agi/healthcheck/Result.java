@@ -12,21 +12,21 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class Result {
-    protected boolean success = true;
+    protected Boolean success;
     
     protected String message;
     
-    private Instant startTime;
+    protected Instant startTime;
     
-    private Instant endTime;
+    protected Instant endTime;
     
-    protected long responseTimeSecs = -1;
+    protected double responseTimeSecs = -1;
     
     protected List<Result> results = new ArrayList<Result>();
     
     protected List<Result> resultsFailed = new ArrayList<Result>();
     
-    protected Map<String,Object> reportMap = new HashMap<>();
+    protected Map<String,Object> reportMap;
 
     public boolean isSuccess() {
         return success;
@@ -44,21 +44,27 @@ public abstract class Result {
         this.message = message;
     }
 
-    public long getResponseTimeSecs() {
+    public double getResponseTimeSecs() {
         return responseTimeSecs;
     }
 
-    public void setResponseTimeSecs(long responseTimeSecs) {
+    public void setResponseTimeSecs(double responseTimeSecs) {
         this.responseTimeSecs = responseTimeSecs;
     }
     
     public void addResult(Result result) {
         this.results.add(result);
-        
-        if (!result.success) {
+                
+        if (result.success != null && !result.success) {
             this.success = false;
             this.resultsFailed.add(result);
             this.message = this.resultsFailed.get(0).getMessage();
+        }
+        if (result.getResponseTimeSecs() >= 0) {
+            if (this.responseTimeSecs == -1) {
+                this.responseTimeSecs = 0;
+            }
+            this.responseTimeSecs += result.getResponseTimeSecs();
         }
     }
     
@@ -72,7 +78,16 @@ public abstract class Result {
         this.responseTimeSecs = Duration.between(startTime, endTime).toSeconds();
     }
     
-    public abstract String getReport();
+    public String getReport() {
+        this.getRawReport();
+        try {
+            return new ObjectMapper().writeValueAsString(reportMap);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException(e.getMessage());
+        }
+
+    };
     
     public abstract Map<String,Object> getRawReport();
 }

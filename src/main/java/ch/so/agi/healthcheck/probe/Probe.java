@@ -3,7 +3,6 @@ package ch.so.agi.healthcheck.probe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
@@ -11,8 +10,6 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest.Builder;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,19 +21,24 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ch.so.agi.healthcheck.model.CheckVars;
+import ch.so.agi.healthcheck.check.Check;
+import ch.so.agi.healthcheck.check.CheckFactory;
 import ch.so.agi.healthcheck.model.CheckVarsDTO;
 import ch.so.agi.healthcheck.model.ProbeVarsDTO;
 import ch.so.agi.healthcheck.model.ResourceDTO;
 
-public interface Probe {
+public abstract class Probe {
     final Logger log = LoggerFactory.getLogger(Probe.class);
-      
-    default void beforeRequest() {
-        
-    };
     
-    default HttpResponse<InputStream> performRequest(String resourceUrl, String requestParameters, String requestTemplate,
+    private String 
+    
+    protected HttpResponse<?> response;
+    
+    protected ProbeResult probeResult;
+    
+    public void beforeRequest() {};
+    
+    public void performRequest(String resourceUrl, String requestParameters, String requestTemplate,
             String requestMethod, Map<String, String> requestHeaders) throws IOException, InterruptedException {
 
         Map<String, Object> requestParamsMap = null;
@@ -79,8 +81,7 @@ public interface Probe {
                 }
                 
                 HttpRequest request = requestBuilder.build();
-
-                HttpResponse<InputStream> response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
+                response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
                 
 //                System.out.println(response.body());
 //                System.out.println(response.statusCode());
@@ -88,16 +89,22 @@ public interface Probe {
 //                HttpHeaders headers = response.headers();
 //                headers.map().forEach((k, v) -> System.out.println(k + ":" + v));
                 
-                return response;
             }                
-        return null;
     }
    
-    default void afterRequest() {};
-   
-    public void runChecks(ProbeResult2 result, List<CheckVarsDTO> checksVars);
+    public void afterRequest() {};
+       
+    public void runChecks(List<CheckVarsDTO> checksVars) {
+        for (CheckVarsDTO checkVars : checksVars) {
+            Check check = CheckFactory.getCheck(checkVars.getCheckClass());
+            check.setProbe(this);
+            check.perform(checkVars);
+            
+            probeResult.addResult(check.getResult());
+        }
+    };
     
-    public ProbeResult2 run(ResourceDTO resource, ProbeVarsDTO probeVars);
+    public void run(ResourceDTO resource, ProbeVarsDTO probeVars) throws IOException, InterruptedException  {};
 //    default void run(String url, ProbeVarsDTO probeVars) {
 //        log.info(url);
 //        log.info(requestParameters);
@@ -108,4 +115,12 @@ public interface Probe {
         
 //        this.runChecks();
 //    }
+    
+    public HttpResponse<?> getResponse() {
+        return response;
+    }
+    
+    public ProbeResult getProbeResult() {
+        return probeResult;
+    }
 }

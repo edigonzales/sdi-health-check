@@ -15,23 +15,16 @@ public class CheckResult extends Result {
         this.check = check;
     }
     
-    // TODO: report pojo? doch sinnvoll?
-    public String getReport() {
-        // TODO name!
+    @Override
+    public Map<String,Object> getRawReport() {
+        reportMap = new HashMap<>();
         reportMap.put("class", this.check.getClass().getCanonicalName());
+        reportMap.put("name", "todo: check name");
+        reportMap.put("description", "todo: check description");
         reportMap.put("success", this.success);
         reportMap.put("message", this.message);
-        reportMap.put("response_time", String.valueOf(this.responseTimeSecs));
-        try {
-            return new ObjectMapper().writeValueAsString(reportMap);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException(e.getMessage());
-        }
-    }
-    
-    public Map<String,Object> getRawReport() {
-        this.getReport();
+        reportMap.put("response_time", this.responseTimeSecs);
+
         return reportMap;
     }
 }

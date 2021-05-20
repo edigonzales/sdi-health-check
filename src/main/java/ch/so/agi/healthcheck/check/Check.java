@@ -1,14 +1,10 @@
 package ch.so.agi.healthcheck.check;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.so.agi.healthcheck.Result;
 import ch.so.agi.healthcheck.model.CheckVarsDTO;
 import ch.so.agi.healthcheck.probe.Probe;
-import ch.so.agi.healthcheck.probe.ProbeResult2;
 
 public abstract class Check {
     final Logger log = LoggerFactory.getLogger(Check.class);
@@ -37,5 +33,4 @@ public abstract class Check {
     } 
     
     public abstract void perform(CheckVarsDTO checkVars);
-
 }

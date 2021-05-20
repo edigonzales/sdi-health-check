@@ -18,21 +18,21 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import ch.so.agi.healthcheck.model.CheckVarsDTO;
-import ch.so.agi.healthcheck.probe.Probe;
-import ch.so.agi.healthcheck.probe.ProbeResult2;
 
 public class HasUniqueWmsLayerIdentifiers extends Check {
 
     @Override
     public void perform(CheckVarsDTO checkVars) {
-        log.info("HasUniqueWmsLayerIdentifiers");
-        
+        log.info("Performing: " + this.getClass().getCanonicalName());
+                
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         
+        this.setResult(false, "not ok...");
+
         
         
         

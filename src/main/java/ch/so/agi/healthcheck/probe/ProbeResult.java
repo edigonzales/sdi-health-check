@@ -18,29 +18,23 @@ public class ProbeResult extends Result {
         this.probe = probe;
     }
 
-    public String getReport() {
-        reportMap.put("class", this.probe.getClass().getCanonicalName());
-        reportMap.put("success", this.success);
-        reportMap.put("message", this.message);
-        reportMap.put("response_time", String.valueOf(this.responseTimeSecs));
-        
-        List<Map> reports = new ArrayList<>();
-        for (Result result : this.results) {
-            reports.add(((CheckResult) result).getRawReport());
-        }
-        reportMap.put("reports", reports);
-        
-        try {
-            return new ObjectMapper().writeValueAsString(reportMap);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException(e.getMessage());
-        }
-    }
-
     @Override
     public Map<String, Object> getRawReport() {
-        this.getReport();
+        reportMap = new HashMap<>();
+        reportMap.put("class", this.probe.getClass().getCanonicalName());
+        reportMap.put("name", "todo");
+        reportMap.put("description", "todo");
+        reportMap.put("success", this.success);
+        reportMap.put("message", this.message);
+        reportMap.put("response_time", this.responseTimeSecs);
+        
+        List<Map<String,Object>> reports = new ArrayList<>();
+        for (Result result : this.results) {
+            CheckResult checkResult = ((CheckResult) result);
+            reports.add(checkResult.getRawReport());
+        }
+        reportMap.put("checks", reports);
+
         return reportMap;
     }
 

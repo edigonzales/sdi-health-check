@@ -1,5 +1,6 @@
 package ch.so.agi.healthcheck.probe;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.time.Instant;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.so.agi.healthcheck.ResourceResult;
 import ch.so.agi.healthcheck.check.CheckResult;
 import ch.so.agi.healthcheck.model.ProbeVars;
 import ch.so.agi.healthcheck.model.ProbeVarsDTO;
@@ -47,64 +49,39 @@ public class Runner {
         
         Resource resource = resourceRepository.findById(id).orElseThrow();
         
-        // Brauche ich wahrscheinlich nicht mehr. Die DTO werden von Spring Data befüllt.
-        // Ich will hier nichts mehr mit JPA zu tun haben (?!)
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration()
         .setFieldMatchingEnabled(true)
         .setFieldAccessLevel(AccessLevel.PRIVATE);
 
         ResourceDTO resourceDTO = modelMapper.map(resource, ResourceDTO.class);
-        
         List<ProbeVarsDTO> probesVars = resourceDTO.getProbesVars();
         
-        // TODO:
-        // responseTime vs. elapsedTime.
-        // a) naming?
-        // b) summe aller probes elapsedTime ergibt resonseTime von run.
-        // Eigentlich passt mir responseTime nicht so, erinnert doch stark an request/response.
-        // Aber vielleicht doch ok. Oder nur dort, wo es wirklich ein request/response im Check gibt? Z.B. getMap().
-        // Was ist dann mit getCapabilities?
-        // Probe _und_ Check haben responseTime.
-        // Konzentrierter anschauen morgen.
+        ResourceResult resourceResult = new ResourceResult(resourceDTO);
+        resourceResult.start();
         
         for (ProbeVarsDTO probeVars : probesVars) {
-            log.info(probeVars.getJobrunrId());
-            log.info(probeVars.getParameters());    
-            log.info(probeVars.getProbeClass());
-        
             ProbeFactory probeFactory = new ProbeFactory();
-            Probe probe = probeFactory.getProbe(probeVars.getProbeClass());
-            log.info(probe.getClass().toString());
-                    
-            Instant startProbe = Instant.now();
-            ProbeResult2 result = probe.run(resourceDTO, probeVars);
-            Instant finishProbe = Instant.now();
-            
-            long elapsedTime = Duration.between(startProbe, finishProbe).toMillis();
-            result.setElapsedTime(elapsedTime);
-            
-            Run runObj = new Run();
-            runObj.setCheckedDatetime(new Date());
-            
-            if(result.isSuccess()) {
-                runObj.setMessage("OK");
-                runObj.setSuccess(true);
-            } else {
-                // TODO stream api?
-                List<String> checkResultMessages = new ArrayList<String>();
-                for (CheckResult checkResult : result.getCheckResults()) {
-                    if(!checkResult.isSuccess()) {
-                        checkResultMessages.add(checkResult.getMessage());
-                    }
-                }
-                runObj.setReport(null); // TODO: mit jackson serialisieren
-                runObj.setMessage(String.join(", ", checkResultMessages));
-                runObj.setSuccess(false);
+            Probe probe = probeFactory.getProbe(probeVars.getProbeClass());                    
+            try {
+                probe.run(resourceDTO, probeVars);
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+                log.error(e.getMessage());
+                probe.getProbeResult().setMessage(e.getMessage());
             }
-            
-            runObj.setResource(resource);
-            runRepository.save(runObj);
+            resourceResult.addResult(probe.getProbeResult());
         }
+        
+        resourceResult.stop();
+        
+        Run runObj = new Run();
+        runObj.setCheckedDatetime(new Date());
+        runObj.setSuccess(resourceResult.isSuccess());
+        runObj.setMessage(resourceResult.getMessage());
+        runObj.setReport(resourceResult.getReport());
+        runObj.setResponseTime(resourceResult.getResponseTimeSecs());
+        runObj.setResource(resource);
+        runRepository.save(runObj);
     }
 }

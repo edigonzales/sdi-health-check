@@ -1,5 +1,6 @@
 package ch.so.agi.healthcheck.probe;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.http.HttpResponse;
 import java.util.Arrays;
@@ -21,7 +22,7 @@ import ch.so.agi.healthcheck.model.ResourceDTO;
 
 @Service
 // TODO Beschreibung etc. als Annotation?
-public class WmsGetCaps implements Probe {
+public class WmsGetCaps extends Probe {
     private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     private String requestMethod = "GET";
@@ -31,54 +32,25 @@ public class WmsGetCaps implements Probe {
     @ParamDefinition(name = "service", description = "The WMS service within resource endpoint")
     @ParamDefinition(name = "version", description = "The WMS service version within resource endpoint")
     private String requestTemplate = "?SERVICE=${service}&VERSION=${version}&REQUEST=GetCapabilities";
-    
+        
     // TODO: mit getXXXXXX im Interface könnte man es wohl schon noch so machen, dass man run nicht
     // zu implementieren braucht im Regelfall.
     @Override
-    public ProbeResult2 run(ResourceDTO resource, ProbeVarsDTO probeVars) {
-        ProbeResult2 result = new ProbeResult2();
-               
-        this.beforeRequest();
-        try {
-            HttpResponse<InputStream> response = this.performRequest(resource.getUrl(), probeVars.getParameters(), this.requestTemplate, this.requestMethod, this.requestHeaders);
-            result.setResponse(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        this.afterRequest();
-        this.runChecks(result, probeVars.getChecksVars());
-     
-//        // TODO: default interface o.ä.
-//        for (CheckResult checkResult : result.getCheckResults()) {
-//            if (!checkResult.isSuccess()) {
-//                result.setSuccess(false);
-//            }
-//        }
+    public void run(ResourceDTO resource, ProbeVarsDTO probeVars) throws IOException, InterruptedException {
         
-        return result;
+        // performRequest kann schon einige Zeit in Anspruch nehmen. Das verwirrt eventuell wenn man
+        // die responseTime der Probe anschaut. Diese setzt sich aus der Summe der responseTimes
+        // sämtlicher Checks und dem Request der Probe zusammen.
+        
+        probeResult = new ProbeResult(this);
+        probeResult.start();
+        
+        this.beforeRequest();
+        this.performRequest(resource.getUrl(), probeVars.getParameters(), this.requestTemplate, this.requestMethod, this.requestHeaders);
+        this.afterRequest();
+        this.runChecks(probeVars.getChecksVars());
+     
+        probeResult.stop();
     }
 
-    @Override
-    public void runChecks(ProbeResult2 result, List<CheckVarsDTO> checksVars) {
-        log.info("{}", result.isSuccess());
-        
-        
-        ProbeResult probeResult = new ProbeResult(this);
-
-        
-        for (CheckVarsDTO checkVars : checksVars) {
-            Check check = CheckFactory.getCheck(checkVars.getCheckClass());
-            check.setProbe(this);
-            check.perform(checkVars);
-            
-            check.setResult(false, "not ok...");
-
-            System.out.println("*" + check);
-            probeResult.addResult(check.getResult());
-            
-        }
-        
-        log.info(probeResult.getReport());
-
-    };
 }
