@@ -21,9 +21,6 @@ public class HttpHasHeaderValue extends Check {
     public void perform(CheckVarsDTO checkVars) throws IOException {
         log.info("Performing: " + this.getClass().getCanonicalName());
 
-        log.info(checkVars.toString());
-        log.info(checkVars.getParameters());
-
         Map<String, Object> paramsMap = null;
         paramsMap = new ObjectMapper().readValue(checkVars.getParameters(), HashMap.class);
 
@@ -48,12 +45,12 @@ public class HttpHasHeaderValue extends Check {
 
     @Override
     public String getName() {
-        return "Has specific Content-Type";
+        return "Has specific HTTP Header value";
     }
 
     @Override
     public String getDescription() {
-        return "HTTP response has specific Content-Type";
+        return "HTTP response has specific HTTP Header value";
     }
 
 }
