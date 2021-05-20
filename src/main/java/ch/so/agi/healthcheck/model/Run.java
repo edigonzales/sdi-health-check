@@ -12,26 +12,37 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
+
+import com.vladmihalcea.hibernate.type.json.JsonType;
+
+@TypeDefs({
+    @TypeDef(name = "json", typeClass = JsonType.class)
+})
 @Entity
 public class Run {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
     
-//    @NotNull
+    @NotNull
     private Date checkedDatetime;
     
-    private boolean success;
+    @NotNull
+    private Boolean success;
     
-//    @NotNull
+    @NotNull
     private double responseTime;
     
-//    @NotNull
-    @Column(length = 100000)
+    //@NotNull
+    @Column(columnDefinition="TEXT")
     private String message;
     
-//    @NotNull
-    @Column(length = 100000)
+    @NotNull
+    @Type(type = "json")
+    @Column(columnDefinition = "json")
     private String report;
     
     @ManyToOne(fetch = FetchType.LAZY)

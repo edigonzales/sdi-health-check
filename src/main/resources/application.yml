@@ -39,11 +39,17 @@ app:
           probeClass: ch.so.agi.healthcheck.probe.WmsGetCaps
           parameters: "{\"service\": \"WMS\", \"version\": \"1.3.0\"}"
           checksVars:
-            - identifier: 111
-              checkClass: ch.so.agi.healthcheck.check.HttpStatusNoError
-              parameters: 
-            - identifier: 111
-              checkClass: ch.so.agi.healthcheck.check.HasUniqueWmsLayerIdentifiers
+#            - identifier: 111
+#              checkClass: ch.so.agi.healthcheck.check.HttpStatusNoError
+#              parameters: 
+#            - identifier: 112
+#              checkClass: ch.so.agi.healthcheck.check.HasUniqueWmsLayerIdentifiers
+#              parameters: 
+#            - identifier: 113
+#              checkClass: ch.so.agi.healthcheck.check.HttpHasHeaderValue
+#              parameters: "{\"headerName\": \"content-type\", \"headerValue\": \"text/xml\"}"
+            - identifier: 114
+              checkClass: ch.so.agi.healthcheck.check.XmlParse
               parameters: 
 
            

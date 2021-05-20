@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import ch.so.agi.healthcheck.ResourceResult;
 import ch.so.agi.healthcheck.check.CheckResult;
@@ -38,6 +39,9 @@ public class Runner {
     
     @Autowired
     RunRepository runRepository;
+    
+    @Autowired
+    ObjectMapper jacksonMapper;
 
     // Was ist am sinnvollsten? Insbs. was funktioniert mit verteilten Jobs?
     // Entity vs. DTO vs. ... ?
@@ -73,26 +77,23 @@ public class Runner {
         }
         
         resourceResult.stop();
+        log.info("Done: " + resource.getTitle());
         
         Run runObj = new Run();
         runObj.setCheckedDatetime(new Date());
         runObj.setSuccess(resourceResult.isSuccess());
         runObj.setMessage(resourceResult.getMessage());
-        runObj.setReport(resourceResult.getReport());
+        try {
+            runObj.setReport(jacksonMapper.writeValueAsString(resourceResult));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            runObj.setReport(e.getMessage());
+        }
         runObj.setResponseTime(resourceResult.getResponseTimeSecs());
         runObj.setResource(resource);
         runRepository.save(runObj);
         
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            String foo = objectMapper.writeValueAsString(resourceResult);
-            
-            System.out.println(foo);
-            
-        } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+
         
     }
 }

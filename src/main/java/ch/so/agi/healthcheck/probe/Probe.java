@@ -40,12 +40,7 @@ public abstract class Probe implements IProbe {
             String requestMethod, Map<String, String> requestHeaders) throws IOException, InterruptedException {
 
         Map<String, Object> requestParamsMap = null;
-        try {
-            requestParamsMap = new ObjectMapper().readValue(requestParameters, HashMap.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
+        requestParamsMap = new ObjectMapper().readValue(requestParameters, HashMap.class);
         
         StringSubstitutor sub = new StringSubstitutor(requestParamsMap);
         String resolvedRequestTemplate = sub.replace(requestTemplate);
@@ -87,12 +82,12 @@ public abstract class Probe implements IProbe {
    
     public void afterRequest() {};
        
-    public void runChecks(List<CheckVarsDTO> checksVars) {
+    public void runChecks(List<CheckVarsDTO> checksVars) throws IOException {
         for (CheckVarsDTO checkVars : checksVars) {
             Check check = CheckFactory.getCheck(checkVars.getCheckClass());
             check.setProbe(this);
             check.perform(checkVars);
-            
+                      
             probeResult.addResult(check.getResult());
         }
     };
@@ -110,8 +105,8 @@ public abstract class Probe implements IProbe {
         this.performRequest(resource.getUrl(), probeVars.getParameters(), getRequestTemplate(), getRequestMethod(), getRequestHeaders());
         this.afterRequest();
         this.runChecks(probeVars.getChecksVars());
-     
-        probeResult.stop();
+             
+        probeResult.stop();        
     }
     
     public HttpResponse<?> getResponse() {

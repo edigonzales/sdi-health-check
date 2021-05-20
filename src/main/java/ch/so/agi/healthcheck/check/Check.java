@@ -1,12 +1,14 @@
 package ch.so.agi.healthcheck.check;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.so.agi.healthcheck.model.CheckVarsDTO;
 import ch.so.agi.healthcheck.probe.Probe;
 
-public abstract class Check {
+public abstract class Check implements ICheck {
     final Logger log = LoggerFactory.getLogger(Check.class);
 
     protected Probe probe;
@@ -32,5 +34,5 @@ public abstract class Check {
         return this.result;
     } 
     
-    public abstract void perform(CheckVarsDTO checkVars);
+    public abstract void perform(CheckVarsDTO checkVars) throws IOException;
 }
