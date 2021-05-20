@@ -5,7 +5,11 @@
 - GetMap (1x und alle)
 - ÖREB (Antwort je nach Anfrageparameter -> bedingt jedoch XSD)
 - ilimodels.xml ff
-- GUI (Web GIS)
+- GUI (Web GIS), Teaser...
+- WFS
+- Dataservice (json?)
+- Searchservice (json?)
+- Dataproductservice (json?)
 ### GUI
 - GUI...
 ### Varia
