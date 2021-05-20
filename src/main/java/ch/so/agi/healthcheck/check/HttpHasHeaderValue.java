@@ -43,8 +43,6 @@ public class HttpHasHeaderValue extends Check {
                 }
                 this.setResult(false, "HTTP response header " + headerName + " has no value " + headerValue);
             });
-
-            System.out.println("fubar");
         }
     }
 
