@@ -1,4 +1,15 @@
 # sdi-health-check
 
 ## todo
-- Eine Transaktion zusammen mit jobrunr geht wahrscheinlich nicht. Auch wenn ich nicht JPA, sondern nur JDBC verwenden würde. -> Kann man das genügend gut robust machen?
+### Probes / Checks
+- GetMap (1x und alle)
+- ÖREB (Antwort je nach Anfrageparameter -> bedingt jedoch XSD)
+- ilimodels.xml ff
+- GUI (Web GIS)
+### GUI
+- GUI...
+### Varia
+- Falls kein GUI -> Probe manuell auslösen?
+- Authentification
+
+
