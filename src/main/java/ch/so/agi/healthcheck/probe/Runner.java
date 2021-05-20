@@ -16,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ch.so.agi.healthcheck.ResourceResult;
 import ch.so.agi.healthcheck.check.CheckResult;
 import ch.so.agi.healthcheck.model.ProbeVars;
@@ -36,18 +39,14 @@ public class Runner {
     @Autowired
     RunRepository runRepository;
 
-
-    // Würde wahrscheinlich so eh nicht mehr gehen, wenn die Klasse in einem anderen
-    // Container läuft... Oder dann erst recht wieder (eigentlich)?
-    // TODO: use jdbc templates instead (?). read only.
-    // oder DTO projection?
-    // oder eager (in unserem Fall wohl kein Drama).
-    // oder doch DTO übergeben, das kann ja jetzt einfach serialisert werden und ist nicht extrem gross.
+    // Was ist am sinnvollsten? Insbs. was funktioniert mit verteilten Jobs?
+    // Entity vs. DTO vs. ... ?
     @Transactional
-    public void run(Long id) {
-        log.info("id: " + id);
-        
+    public void run(Long id) {        
         Resource resource = resourceRepository.findById(id).orElseThrow();
+        
+        log.info("Performing: " + resource.getTitle());
+        log.info("id: " + id);
         
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration()
@@ -83,5 +82,17 @@ public class Runner {
         runObj.setResponseTime(resourceResult.getResponseTimeSecs());
         runObj.setResource(resource);
         runRepository.save(runObj);
+        
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String foo = objectMapper.writeValueAsString(resourceResult);
+            
+            System.out.println(foo);
+            
+        } catch (JsonProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
     }
 }

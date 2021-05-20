@@ -27,10 +27,8 @@ import ch.so.agi.healthcheck.model.CheckVarsDTO;
 import ch.so.agi.healthcheck.model.ProbeVarsDTO;
 import ch.so.agi.healthcheck.model.ResourceDTO;
 
-public abstract class Probe {
+public abstract class Probe implements IProbe {
     final Logger log = LoggerFactory.getLogger(Probe.class);
-    
-    private String 
     
     protected HttpResponse<?> response;
     
@@ -53,35 +51,30 @@ public abstract class Probe {
         String resolvedRequestTemplate = sub.replace(requestTemplate);
                 
         String requestUrl = resourceUrl + resolvedRequestTemplate;
-        log.info(requestUrl);
-        
+        HttpClient httpClient = HttpClient.newBuilder().version(Version.HTTP_1_1).followRedirects(Redirect.ALWAYS)
+                .build();
 
-            HttpClient httpClient = HttpClient.newBuilder()
-                    .version(Version.HTTP_1_1)
-                    .followRedirects(Redirect.ALWAYS)
-                    .build();
-            
-            if (requestMethod.equalsIgnoreCase("GET")) {                
-                Builder requestBuilder = HttpRequest.newBuilder();
-                requestBuilder
-                    .GET()
-                    .uri(URI.create(requestUrl));
-                
-                Map<String, String> standardRequestHeaders = new HashMap<String, String>() {{
+        if (requestMethod.equalsIgnoreCase("GET")) {
+            Builder requestBuilder = HttpRequest.newBuilder();
+            requestBuilder.GET().uri(URI.create(requestUrl));
+
+            Map<String, String> standardRequestHeaders = new HashMap<String, String>() {
+                {
                     put("User-Agent", "SdiHealthCheck");
                     put("Accept-Encoding", "deflate, gzip;q=1.0, *;q=0.5");
-                }};
-                 
-                for (Map.Entry<String, String> entry : standardRequestHeaders.entrySet()) {
-                    requestBuilder.setHeader(entry.getKey(), entry.getValue());
                 }
-                
-                for (Map.Entry<String, String> entry : requestHeaders.entrySet()) {
-                    requestBuilder.setHeader(entry.getKey(), entry.getValue());
-                }
-                
-                HttpRequest request = requestBuilder.build();
-                response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            };
+
+            for (Map.Entry<String, String> entry : standardRequestHeaders.entrySet()) {
+                requestBuilder.setHeader(entry.getKey(), entry.getValue());
+            }
+
+            for (Map.Entry<String, String> entry : requestHeaders.entrySet()) {
+                requestBuilder.setHeader(entry.getKey(), entry.getValue());
+            }
+
+            HttpRequest request = requestBuilder.build();
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
                 
 //                System.out.println(response.body());
 //                System.out.println(response.statusCode());
@@ -89,7 +82,7 @@ public abstract class Probe {
 //                HttpHeaders headers = response.headers();
 //                headers.map().forEach((k, v) -> System.out.println(k + ":" + v));
                 
-            }                
+        }                
     }
    
     public void afterRequest() {};
@@ -103,18 +96,23 @@ public abstract class Probe {
             probeResult.addResult(check.getResult());
         }
     };
-    
-    public void run(ResourceDTO resource, ProbeVarsDTO probeVars) throws IOException, InterruptedException  {};
-//    default void run(String url, ProbeVarsDTO probeVars) {
-//        log.info(url);
-//        log.info(requestParameters);
-//        
-//        this.beforeRequest();
-//        this.performRequest(url, requestParameters, getRequestTemplate());
-//        this.afterRequest();
+   
+    public void run(ResourceDTO resource, ProbeVarsDTO probeVars) throws IOException, InterruptedException {
+        // performRequest kann einige Zeit in Anspruch nehmen. Das verwirrt eventuell wenn man
+        // die responseTime der Probe anschaut. Diese setzt sich aus der Summe der responseTimes
+        // sämtlicher Checks und dem Request der Probe zusammen.
+        log.info("Performing: " + this.getClass().getCanonicalName());
         
-//        this.runChecks();
-//    }
+        probeResult = new ProbeResult(this);
+        probeResult.start();
+        
+        this.beforeRequest();
+        this.performRequest(resource.getUrl(), probeVars.getParameters(), getRequestTemplate(), getRequestMethod(), getRequestHeaders());
+        this.afterRequest();
+        this.runChecks(probeVars.getChecksVars());
+     
+        probeResult.stop();
+    }
     
     public HttpResponse<?> getResponse() {
         return response;
