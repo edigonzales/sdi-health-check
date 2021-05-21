@@ -48,9 +48,15 @@ app:
 #            - identifier: 113
 #              checkClass: ch.so.agi.healthcheck.check.HttpHasHeaderValue
 #              parameters: "{\"headerName\": \"content-type\", \"headerValue\": \"text/xml\"}"
-            - identifier: 114
-              checkClass: ch.so.agi.healthcheck.check.XmlParse
-              parameters: 
+#            - identifier: 114
+#              checkClass: ch.so.agi.healthcheck.check.XmlParse
+#              parameters: 
+#            - identifier: 115
+#              checkClass: ch.so.agi.healthcheck.check.ContainsStrings
+#              parameters: "{\"strings\": \"WMS_Capabilities,Geoinformation,AGI\"}"
+            - identifier: 116
+              checkClass: ch.so.agi.healthcheck.check.NotContainsStrings
+              parameters: "{\"strings\": \"<ServiceException,LayerNotDefined\"}"
 
            
       
