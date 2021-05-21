@@ -6,7 +6,7 @@ public class HttpStatusNoError extends Check {
 
     @Override
     public void perform(CheckVarsDTO checkVars) {
-        log.info("Performing: " + this.getClass().getCanonicalName());
+        log.info("Check: " + this.getClass().getCanonicalName());
         
         int statusCode = this.probe.getResponse().statusCode();
         if (statusCode >= 400 && statusCode < 600) {            

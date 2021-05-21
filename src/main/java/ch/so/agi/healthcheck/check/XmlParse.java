@@ -28,7 +28,7 @@ public class XmlParse extends Check {
 
     @Override
     public void perform(CheckVarsDTO checkVars) throws IOException {
-        log.info("Performing: " + this.getClass().getCanonicalName());
+        log.info("Check: " + this.getClass().getCanonicalName());
 
         InputStream is = (InputStream) this.probe.getResponse().body();
         

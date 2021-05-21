@@ -28,7 +28,7 @@ public class HttpHasHeaderValue extends Check {
         String headerValue = (String) paramsMap.get("headerValue");
 
         HttpHeaders headers = this.probe.getResponse().headers();
-        headers.map().forEach((k, v) -> System.out.println(k + ":" + v));
+        //headers.map().forEach((k, v) -> System.out.println(k + ":" + v));
 
         if (!headers.map().containsKey(headerName)) {
             this.setResult(false, "HTTP response has no header" + headerName);

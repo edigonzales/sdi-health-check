@@ -92,8 +92,5 @@ public class Runner {
         runObj.setResponseTime(resourceResult.getResponseTimeSecs());
         runObj.setResource(resource);
         runRepository.save(runObj);
-        
-
-        
     }
 }

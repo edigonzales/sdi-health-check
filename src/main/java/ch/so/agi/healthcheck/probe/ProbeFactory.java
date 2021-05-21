@@ -11,7 +11,11 @@ public class ProbeFactory {
             return null;
         } else if (probeType.equalsIgnoreCase("ch.so.agi.healthcheck.probe.WmsGetCaps")) {
             return new ch.so.agi.healthcheck.probe.WmsGetCaps();
-        }
+        } else if (probeType.equalsIgnoreCase("ch.so.agi.healthcheck.probe.WmsGetMap")) {
+            return new ch.so.agi.healthcheck.probe.WmsGetMap();
+        } else if (probeType.equalsIgnoreCase("ch.so.agi.healthcheck.probe.WmsGetMapAll")) {
+            return new ch.so.agi.healthcheck.probe.WmsGetMapAll();
+        } 
         return null;
     }
     

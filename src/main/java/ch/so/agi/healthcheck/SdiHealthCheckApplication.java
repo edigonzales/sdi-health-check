@@ -77,7 +77,7 @@ public class SdiHealthCheckApplication {
             CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(CronType.UNIX);
             CronParser parser = new CronParser(cronDefinition);
 
-            for (ProbeVars probeVars : resource.getProbesVars()) {
+//            for (ProbeVars probeVars : resource.getProbesVars()) {
                 jobScheduler.<Runner>enqueue(x -> x.run(resource.getId()));
 //                try {
 //                    Cron quartzCron = parser.parse(resource.getRunFrequency());
@@ -87,7 +87,7 @@ public class SdiHealthCheckApplication {
 //                    // TODO: do something
 //                    throw new IllegalArgumentException(e);
 //                }
-            }
+//            }
         };
     }
     

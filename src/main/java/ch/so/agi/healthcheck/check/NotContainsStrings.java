@@ -31,8 +31,10 @@ public class NotContainsStrings extends Check {
 
     @Override
     public void perform(CheckVarsDTO checkVars) throws IOException {
-        log.info("Performing: " + this.getClass().getCanonicalName());
+        log.info("Check: " + this.getClass().getCanonicalName());
         
+        //TODO: Was passiert wenn String sehr gross ist (z.B. wenn
+        // es ein Bild ist)?
         InputStream is = (InputStream) this.probe.getResponse().body();
         String responseText = new BufferedReader(
                 new InputStreamReader(is, StandardCharsets.UTF_8))

@@ -1,11 +1,16 @@
 package ch.so.agi.healthcheck.check;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,7 +28,7 @@ public class HasUniqueWmsLayerIdentifiers extends Check {
 
     @Override
     public void perform(CheckVarsDTO checkVars) {
-        log.info("Performing: " + this.getClass().getCanonicalName());
+        log.info("Check: " + this.getClass().getCanonicalName());
 
         // TODO: Wird eigentlich beim Inputstream der body bereits heruntergeladen?
         // Nein, ich glaube nicht: https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http/HttpResponse.BodySubscriber.html

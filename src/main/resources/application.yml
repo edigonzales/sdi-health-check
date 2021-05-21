@@ -31,6 +31,7 @@ app:
     - identifier: 1
       title: SOGIS WMS (Prod)
       url: https://geo.so.ch/wms
+      #url: http://map.geo.gl.ch/ows/mainmap
       type: OGC_WMS
       runFrequency: 0 * * * *
       active: true
@@ -39,12 +40,12 @@ app:
           probeClass: ch.so.agi.healthcheck.probe.WmsGetCaps
           parameters: "{\"service\": \"WMS\", \"version\": \"1.3.0\"}"
           checksVars:
-#            - identifier: 111
-#              checkClass: ch.so.agi.healthcheck.check.HttpStatusNoError
-#              parameters: 
-#            - identifier: 112
-#              checkClass: ch.so.agi.healthcheck.check.HasUniqueWmsLayerIdentifiers
-#              parameters: 
+            - identifier: 111
+              checkClass: ch.so.agi.healthcheck.check.HttpStatusNoError
+              parameters: 
+            - identifier: 112
+              checkClass: ch.so.agi.healthcheck.check.HasUniqueWmsLayerIdentifiers
+              parameters: 
 #            - identifier: 113
 #              checkClass: ch.so.agi.healthcheck.check.HttpHasHeaderValue
 #              parameters: "{\"headerName\": \"content-type\", \"headerValue\": \"text/xml\"}"
@@ -54,9 +55,33 @@ app:
 #            - identifier: 115
 #              checkClass: ch.so.agi.healthcheck.check.ContainsStrings
 #              parameters: "{\"strings\": \"WMS_Capabilities,Geoinformation,AGI\"}"
-            - identifier: 116
-              checkClass: ch.so.agi.healthcheck.check.NotContainsStrings
-              parameters: "{\"strings\": \"<ServiceException,LayerNotDefined\"}"
-
-           
-      
+#            - identifier: 116
+#              checkClass: ch.so.agi.healthcheck.check.NotContainsStrings
+#              parameters: "{\"strings\": \"<ServiceException,LayerNotDefined\"}"
+#        - identifier: 12
+#          probeClass: ch.so.agi.healthcheck.probe.WmsGetMap
+#          parameters: "{\"format\": \"image/png\", \"transparent\": \"true\", \"layers\": \"ch.so.agi.av.grundstuecke\", \"styles\": \"\", \"crs\": \"EPSG:2056\", \"width\": \"200\", \"height\": \"200\", \"bbox\": \"2607800.0,1228200.0,2608000.0,1228400.0\"}"
+#          checksVars:
+#            - identifier: 121
+#              checkClass: ch.so.agi.healthcheck.check.HttpHasImageContentType
+#              parameters: 
+#            - identifier: 122
+#              checkClass: ch.so.agi.healthcheck.check.NotContainsStrings
+#              parameters: "{\"strings\": \"<ServiceException,LayerNotDefined\"}"
+#        - identifier: 13
+#          probeClass: ch.so.agi.healthcheck.probe.WmsGetMap
+#          parameters: "{\"format\": \"image/png\", \"transparent\": \"true\", \"layers\": \"ch.so.arp.nutzungsplanung.erschliessungsplanung.verkehrsflaechen\", \"styles\": \"\", \"crs\": \"EPSG:2056\", \"width\": \"200\", \"height\": \"200\", \"bbox\": \"2607800.0,1228200.0,2608000.0,1228400.0\"}"
+#          checksVars:
+#            - identifier: 131
+#              checkClass: ch.so.agi.healthcheck.check.HttpHasImageContentType
+#              parameters: 
+#            - identifier: 132
+#              checkClass: ch.so.agi.healthcheck.check.ContainsStrings
+#              parameters: "{\"strings\": \"<ServiceException,LayerNotDefined\"}"
+#        - identifier: 14
+#          probeClass: ch.so.agi.healthcheck.probe.WmsGetMapAll
+#          parameters: "{\"format\": \"image/png\", \"transparent\": \"true\", \"crs\": \"EPSG:2056\", \"width\": \"200\", \"height\": \"200\", \"bbox\": \"2607800.0,1228200.0,2608000.0,1228400.0\"}"
+#          checksVars:
+#            - identifier: 141
+#              checkClass: ch.so.agi.healthcheck.check.HttpHasImageContentType
+#              parameters: 

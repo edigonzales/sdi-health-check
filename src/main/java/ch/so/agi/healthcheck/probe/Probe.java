@@ -30,6 +30,8 @@ import ch.so.agi.healthcheck.model.ResourceDTO;
 public abstract class Probe implements IProbe {
     final Logger log = LoggerFactory.getLogger(Probe.class);
     
+    protected HttpRequest request;
+    
     protected HttpResponse<?> response;
     
     protected ProbeResult probeResult;
@@ -56,7 +58,12 @@ public abstract class Probe implements IProbe {
             Map<String, String> standardRequestHeaders = new HashMap<String, String>() {
                 {
                     put("User-Agent", "SdiHealthCheck");
-                    put("Accept-Encoding", "deflate, gzip;q=1.0, *;q=0.5");
+                    // FIXME
+                    // Ich kann anscheinend nicht mit komprimierte Antworten
+                    // umgehen. Ich bin nicht sicher, ob es bloss am InputStream
+                    // liegt oder grundsätzlich mit dem HttpClient.
+                    // Workaround: https://stackoverflow.com/questions/53502626/does-java-http-client-handle-compression
+                    //put("Accept-Encoding", "deflate, gzip;q=1.0, *;q=0.5");
                 }
             };
 
@@ -67,15 +74,15 @@ public abstract class Probe implements IProbe {
             for (Map.Entry<String, String> entry : requestHeaders.entrySet()) {
                 requestBuilder.setHeader(entry.getKey(), entry.getValue());
             }
-
-            HttpRequest request = requestBuilder.build();
+            
+            request = requestBuilder.build();
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
                 
 //                System.out.println(response.body());
 //                System.out.println(response.statusCode());
 //
-//                HttpHeaders headers = response.headers();
-//                headers.map().forEach((k, v) -> System.out.println(k + ":" + v));
+                HttpHeaders headers = response.headers();
+                //headers.map().forEach((k, v) -> System.out.println(k + ":" + v));
                 
         }                
     }
@@ -106,6 +113,7 @@ public abstract class Probe implements IProbe {
         this.afterRequest();
         this.runChecks(probeVars.getChecksVars());
              
+        probeResult.setRequest(request.uri().toASCIIString());
         probeResult.stop();        
     }
     
