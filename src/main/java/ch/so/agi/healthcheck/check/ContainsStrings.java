@@ -3,8 +3,11 @@ package ch.so.agi.healthcheck.check;
 import java.io.IOException;
 
 import ch.so.agi.healthcheck.model.CheckVarsDTO;
+import ch.so.agi.healthcheck.probe.ParamDefinition;
 
 public class ContainsStrings extends Check {
+    @ParamDefinition(name = "strings", description = "The string text(s) that should be contained in response (comma-separated)")
+    private String strings;
 
     @Override
     public String getName() {
