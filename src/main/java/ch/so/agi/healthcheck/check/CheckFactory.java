@@ -11,6 +11,8 @@ public class CheckFactory {
             return null;
         } else if (probeCheck.equalsIgnoreCase("ch.so.agi.healthcheck.check.HttpStatusNoError")) {
             return new ch.so.agi.healthcheck.check.HttpStatusNoError();
+        } else if (probeCheck.equalsIgnoreCase("ch.so.agi.healthcheck.check.HttpStatusMatch")) {
+            return new ch.so.agi.healthcheck.check.HttpStatusMatch();
         } else if (probeCheck.equalsIgnoreCase("ch.so.agi.healthcheck.check.HasUniqueWmsLayerIdentifiers")) {
             return new ch.so.agi.healthcheck.check.HasUniqueWmsLayerIdentifiers();
         } else if (probeCheck.equalsIgnoreCase("ch.so.agi.healthcheck.check.HttpHasHeaderValue")) {
