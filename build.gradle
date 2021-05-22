@@ -38,7 +38,11 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.12.3'
     implementation 'org.modelmapper:modelmapper:2.4.2'
     implementation group: 'com.cronutils', name: 'cron-utils', version: '9.1.5'
-
+    
+    implementation 'ch.interlis:iox-ili:1.21.6'
+    implementation 'ch.interlis:ili2c-tool:5.2.2'
+    implementation 'ch.interlis:ili2c-core:5.2.2'
+    
     //implementation 'org.geotools:gt-wms:25.0'
     
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'

@@ -41,13 +41,16 @@ public abstract class Probe implements IProbe {
     public void performRequest(String resourceUrl, String requestParameters, String requestTemplate,
             String requestMethod, Map<String, String> requestHeaders) throws IOException, InterruptedException {
 
-        Map<String, Object> requestParamsMap = null;
-        requestParamsMap = new ObjectMapper().readValue(requestParameters, HashMap.class);
-        
-        StringSubstitutor sub = new StringSubstitutor(requestParamsMap);
-        String resolvedRequestTemplate = sub.replace(requestTemplate);
+        String requestUrl = resourceUrl;
+        if (requestParameters != null && requestParameters.trim().length() > 0) {
+            Map<String, Object> requestParamsMap = null;
+            requestParamsMap = new ObjectMapper().readValue(requestParameters, HashMap.class);
+            
+            StringSubstitutor sub = new StringSubstitutor(requestParamsMap);
+            String resolvedRequestTemplate = sub.replace(requestTemplate);
+            requestUrl += resolvedRequestTemplate;
+        }
                 
-        String requestUrl = resourceUrl + resolvedRequestTemplate;
         HttpClient httpClient = HttpClient.newBuilder().version(Version.HTTP_1_1).followRedirects(Redirect.ALWAYS)
                 .build();
 

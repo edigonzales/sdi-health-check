@@ -21,10 +21,16 @@ public class CheckFactory {
             return new ch.so.agi.healthcheck.check.HttpHasImageContentType();
         } else if (probeCheck.equalsIgnoreCase("ch.so.agi.healthcheck.check.XmlParse")) {
             return new ch.so.agi.healthcheck.check.XmlParse();
+        } else if (probeCheck.equalsIgnoreCase("ch.so.agi.healthcheck.check.JsonParse")) {
+            return new ch.so.agi.healthcheck.check.JsonParse();
         } else if (probeCheck.equalsIgnoreCase("ch.so.agi.healthcheck.check.ContainsStrings")) {
             return new ch.so.agi.healthcheck.check.ContainsStrings();
         } else if (probeCheck.equalsIgnoreCase("ch.so.agi.healthcheck.check.NotContainsStrings")) {
             return new ch.so.agi.healthcheck.check.NotContainsStrings();
+        } else if (probeCheck.equalsIgnoreCase("ch.so.agi.healthcheck.check.OerebV1GetEgridValidator")) {
+            return new ch.so.agi.healthcheck.check.OerebV1GetEgridValidator();
+        } else if (probeCheck.equalsIgnoreCase("ch.so.agi.healthcheck.check.CheckRepoIlis")) {
+            return new ch.so.agi.healthcheck.check.CheckRepoIlis();
         }
         
         return null;

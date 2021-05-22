@@ -15,6 +15,14 @@ public class ProbeFactory {
             return new ch.so.agi.healthcheck.probe.WmsGetMap();
         } else if (probeType.equalsIgnoreCase("ch.so.agi.healthcheck.probe.WmsGetMapAll")) {
             return new ch.so.agi.healthcheck.probe.WmsGetMapAll();
+        } else if (probeType.equalsIgnoreCase("ch.so.agi.healthcheck.probe.OerebV1GetEgridByCoord")) {
+            return new ch.so.agi.healthcheck.probe.OerebV1GetEgridByCoord();
+        } else if (probeType.equalsIgnoreCase("ch.so.agi.healthcheck.probe.HttpGetQuery")) {
+            return new ch.so.agi.healthcheck.probe.HttpGetQuery();
+        } else if (probeType.equalsIgnoreCase("ch.so.agi.healthcheck.probe.HttpGet")) {
+            return new ch.so.agi.healthcheck.probe.HttpGet();
+        } else if (probeType.equalsIgnoreCase("ch.so.agi.healthcheck.probe.IliRepoGet")) {
+            return new ch.so.agi.healthcheck.probe.IliRepoGet();
         } 
         return null;
     }

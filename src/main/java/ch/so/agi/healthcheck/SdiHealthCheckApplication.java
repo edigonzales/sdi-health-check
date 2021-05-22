@@ -60,25 +60,46 @@ public class SdiHealthCheckApplication {
     @Transactional
     public CommandLineRunner init(ResourceRepository resourceRepository) {
         return args -> {
-            ResourceDTO resourceDTO = config.getResources().get(0);
-
+            // Resources aus dem application.yml lesen, zu einer Entity umwandeln, 
+            // in die DB schreiben und Jobrunr Job queuen.
+            
             ModelMapper modelMapper = new ModelMapper();
             modelMapper.getConfiguration().setFieldMatchingEnabled(true).setFieldAccessLevel(AccessLevel.PRIVATE);
 
-            Resource resource = modelMapper.map(resourceDTO, Resource.class);
+            for (ResourceDTO resourceDTO : config.getResources()) {                
+                Resource resource = modelMapper.map(resourceDTO, Resource.class);
 
-            for (ProbeVars probeVars : resource.getProbesVars()) {
-                String jobId = UUID.randomUUID().toString();
-                probeVars.setJobrunrId(jobId);
-            }
+                for (ProbeVars probeVars : resource.getProbesVars()) {
+                    String jobId = UUID.randomUUID().toString();
+                    probeVars.setJobrunrId(jobId);
+                }
 
-            resourceRepository.save(resource);
+                resourceRepository.save(resource);
 
-            CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(CronType.UNIX);
-            CronParser parser = new CronParser(cronDefinition);
+                // validate cron expression
+                CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(CronType.UNIX);
+                CronParser parser = new CronParser(cronDefinition);
 
-//            for (ProbeVars probeVars : resource.getProbesVars()) {
                 jobScheduler.<Runner>enqueue(x -> x.run(resource.getId()));
+            }
+            
+            
+            
+//            ResourceDTO resourceDTO = config.getResources().get(0);
+//            Resource resource = modelMapper.map(resourceDTO, Resource.class);
+//
+//            for (ProbeVars probeVars : resource.getProbesVars()) {
+//                String jobId = UUID.randomUUID().toString();
+//                probeVars.setJobrunrId(jobId);
+//            }
+//
+//            resourceRepository.save(resource);
+//
+//            CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(CronType.UNIX);
+//            CronParser parser = new CronParser(cronDefinition);
+//
+//            for (ProbeVars probeVars : resource.getProbesVars()) {
+//                jobScheduler.<Runner>enqueue(x -> x.run(resource.getId()));
 //                try {
 //                    Cron quartzCron = parser.parse(resource.getRunFrequency());
 //                    quartzCron.validate();
