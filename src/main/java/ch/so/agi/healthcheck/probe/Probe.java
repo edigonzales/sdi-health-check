@@ -30,7 +30,7 @@ import ch.so.agi.healthcheck.model.ResourceDTO;
 public abstract class Probe implements IProbe {
     final Logger log = LoggerFactory.getLogger(Probe.class);
     
-    protected HttpRequest request;
+    public HttpRequest request;
     
     protected HttpResponse<?> response;
     

@@ -146,6 +146,23 @@ app:
             - identifier: 401
               checkClass: ch.so.agi.healthcheck.check.HttpStatusNoError
               parameters: 
-            - identifier: 402
+#            - identifier: 402
+#              checkClass: ch.so.agi.healthcheck.check.CheckRepoIlis
+#              parameters: 
+    - identifier: 5
+      title: VSA INTERLIS Modellablage (Prod)
+      url: https://vsa.ch/models
+      type: ILI_REPO
+      runFrequency: 0 * * * *
+      active: true
+      probesVars:
+        - identifier: 51
+          probeClass: ch.so.agi.healthcheck.probe.IliRepoGet
+          parameters: 
+          checksVars:
+            - identifier: 501
+              checkClass: ch.so.agi.healthcheck.check.HttpStatusNoError
+              parameters: 
+            - identifier: 502
               checkClass: ch.so.agi.healthcheck.check.CheckRepoIlis
               parameters: 

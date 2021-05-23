@@ -1,7 +1,17 @@
 package ch.so.agi.healthcheck.check;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import ch.interlis.ili2c.CheckReposIlis;
 import ch.interlis.ili2c.config.Configuration;
@@ -17,51 +27,77 @@ public class CheckRepoIlis extends Check {
     @Override
     public void perform(CheckVarsDTO checkVars) {
         log.info("Check: " + this.getClass().getCanonicalName());
-        
-        int statusCode = this.probe.getResponse().statusCode();
-        if (statusCode >= 400 && statusCode < 600) {            
-            this.setResult(false, "HTTP Error status="+String.valueOf(statusCode));
-        } else {
-            this.setResult(true, null);
-        }
-        
+       
         // Sehr langsam in Eclipse. Sehr schnell als Jar lokal ausgeführt mit ARM-Java. Ursachen?
         // - Rosetta (Eclipse mit JRE)?
         // - Java 15?
-        // - ...
-        
-        
-        // TODO: nicht Main verwenden. Nur für Default-Values o.ä.
-        
-//        UserSettings settings = new UserSettings();
-//        // TODO: Proxy wären wohl sinnvoll.
-////        setDefaultIli2cPathMap(settings);
-//        ch.interlis.ili2c.Main.setDefaultIli2cPathMap(settings);
-////        settings.setHttpProxyHost(httpProxyHost);
-////        settings.setHttpProxyPort(httpProxyPort);
-//        settings.setIlidirs("%ILI_DIR;http://models.interlis.ch/;%JAR_DIR");
-//        
-//        ArrayList<String> ilifilev = new ArrayList<>();
-//        ilifilev.add("https://geo.so.ch/models");
-//        Configuration config = new Configuration();
-//        Iterator ilifilei = ilifilev.iterator();
-//        while (ilifilei.hasNext()) {
-//            String ilifile = (String) ilifilei.next();
-//            FileEntry file = new FileEntry(ilifile, FileEntryKind.ILIMODELFILE);
-//            config.addFileEntry(file);
-//        }
-//        config.setGenerateWarnings(true);
-//        //config.setOutputKind(GenerateOutputKind.NOOUTPUT);
-//
-//        // ??
-//        config.setAutoCompleteModelList(true);
-//        
-//        
-//        boolean failed = new CheckReposIlis().checkRepoIlis(config, settings);
+        // -> Mit nativen Zulu Java 11 ist es normal schnell.
+                
+        UserSettings settings = new UserSettings();
+        ch.interlis.ili2c.Main.setDefaultIli2cPathMap(settings);
+        // TODO: Proxy wären wohl sinnvoll.
+//        settings.setHttpProxyHost(httpProxyHost);
+//        settings.setHttpProxyPort(httpProxyPort);
+        settings.setIlidirs(ch.interlis.ili2c.Main.DEFAULT_ILIDIRS);
 
-        //String[] args = {"--trace", "--check-repo-ilis", "https://geo.so.ch/models"};
-        //ch.interlis.ili2c.Main.main(args);
+        String repository = this.probe.getResponse().request().uri().toASCIIString();
+        Configuration config = new Configuration();
+        FileEntry file = new FileEntry(repository, FileEntryKind.ILIMODELFILE);
+        config.addFileEntry(file);
+        config.setGenerateWarnings(true);
+        // TODO: für was ist das gut?
+        //config.setOutputKind(GenerateOutputKind.NOOUTPUT);
+        // TODO: was macht das?
+        config.setAutoCompleteModelList(true);
         
+        Path ilicachePath;
+        try {
+            ilicachePath = Files.createTempDirectory("ilicache");
+        } catch (IOException e) {
+            e.printStackTrace();
+            this.setResult(false, e.getMessage());
+            return;
+        }
+        
+        Path logfile = Paths.get(ilicachePath.toFile().getAbsolutePath(), "output.log");
+        boolean failed = false;
+        // Der Cache muss immer leer sein für die Prüfung. Weil ja beliebig viele
+        // solche Checks existieren und gleichzeitig laufen können, müssen wir das synchronisieren.
+        synchronized(this) {
+            // Um bessere Fehlermeldungen ("was ist falsch?") machen zu können, lesen wir System.err
+            // aus.
+            PrintStream console = System.err;
+            try {
+                FileOutputStream f = new FileOutputStream(logfile.toFile().getAbsolutePath());
+                System.setErr(new PrintStream(f));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            System.setProperty("user.home", ilicachePath.toFile().getAbsolutePath().toString());
+            failed = new CheckReposIlis().checkRepoIlis(config, settings);
+            System.setErr(console);
+        }
+
+        if (failed) {
+            List<String> list = new ArrayList<>();
+            try (Stream<String> stream = Files.lines(logfile)) {
+                list = stream
+                .filter(s -> {
+                    if (s.contains("not found") || s.contains("compile failed with files")) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                })
+                .collect(Collectors.toList());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            this.setResult(false, "Check of INTERLIS models in repository "+repository+" failed.\n"+String.join(",", list));
+        } else {
+            this.setResult(true, "OK");
+        }
     }
 
     @Override

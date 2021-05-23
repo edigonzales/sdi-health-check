@@ -12,7 +12,7 @@ public class HttpStatusNoError extends Check {
         if (statusCode >= 400 && statusCode < 600) {            
             this.setResult(false, "HTTP Error status="+String.valueOf(statusCode));
         } else {
-            this.setResult(true, null);
+            this.setResult(true, "OK");
         }
     }
 
