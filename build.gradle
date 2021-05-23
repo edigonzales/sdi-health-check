@@ -42,6 +42,7 @@ dependencies {
     implementation 'ch.interlis:iox-ili:1.21.6'
     implementation 'ch.interlis:ili2c-tool:5.2.2'
     implementation 'ch.interlis:ili2c-core:5.2.2'
+    implementation 'ch.interlis:ilivalidator:1.11.10'
     
     //implementation 'org.geotools:gt-wms:25.0'
     

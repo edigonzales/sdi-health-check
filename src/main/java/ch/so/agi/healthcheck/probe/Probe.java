@@ -43,6 +43,11 @@ public abstract class Probe implements IProbe {
 
         String requestUrl = resourceUrl;
         if (requestParameters != null && requestParameters.trim().length() > 0) {
+            // Es wird versucht ein allenfalls doppelt vorhandener Slash zwischen Host und Path zu entfernen.
+            if (requestTemplate.substring(0,1).equalsIgnoreCase(resourceUrl.substring(resourceUrl.length()-1, resourceUrl.length()))) {
+                requestUrl = requestUrl.substring(0, resourceUrl.length()-1);
+            }
+            
             Map<String, Object> requestParamsMap = null;
             requestParamsMap = new ObjectMapper().readValue(requestParameters, HashMap.class);
             

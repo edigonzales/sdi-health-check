@@ -32,4 +32,14 @@ public class OerebV1GetEgridByCoord extends Probe {
         return requestTemplate;
     }
 
+    @Override
+    public String getName() {
+        return "ÖREB V1 GetEgridByCoord";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Request a GetEgridResponse by a coordinate (xy or gnss)";
+    }
+
 }

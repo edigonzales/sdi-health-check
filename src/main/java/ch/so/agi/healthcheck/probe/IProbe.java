@@ -11,4 +11,8 @@ public interface IProbe {
     public String getRequestMethod();
     
     public String getRequestTemplate();
+    
+    public String getName();
+    
+    public String getDescription();
 }

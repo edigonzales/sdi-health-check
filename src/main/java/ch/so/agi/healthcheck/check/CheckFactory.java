@@ -31,6 +31,8 @@ public class CheckFactory {
             return new ch.so.agi.healthcheck.check.OerebV1GetEgridValidator();
         } else if (probeCheck.equalsIgnoreCase("ch.so.agi.healthcheck.check.CheckRepoIlis")) {
             return new ch.so.agi.healthcheck.check.CheckRepoIlis();
+        } else if (probeCheck.equalsIgnoreCase("ch.so.agi.healthcheck.check.Ilivalidator")) {
+            return new ch.so.agi.healthcheck.check.Ilivalidator();
         }
         
         return null;
